@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.annotation.StringRes
@@ -60,6 +61,8 @@ import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.END
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.START
 import org.jetbrains.anko.constraint.layout.ConstraintSetBuilder.Side.TOP
 import org.jetbrains.anko.constraint.layout.applyConstraintSet
+import org.jetbrains.anko.internals.AnkoInternals.addView
+//import org.jetbrains.anko.internals.AnkoInternals.addView
 import org.mozilla.fenix.BrowserDirection
 import org.mozilla.fenix.FenixViewModelProvider
 import org.mozilla.fenix.HomeActivity
@@ -211,24 +214,11 @@ class HomeFragment : Fragment() {
         )
 
 
-        logDebug(
-            "davidwalsh",
-            tabCounter.visible().toString()
+        val tabCounterView = tabCounter.createView(view.tab_tray_button_wrapper)
+        view.tab_tray_button_wrapper.addView(
+            tabCounterView,
+            FrameLayout.LayoutParams(80, 80) // TODO:  Can we use its parent dimensions here?
         )
-        //tabCounter.visible = isVis
-        //tabCounter.
-
-        tabCounter.createView(view.tab_tray_button_wrapper)
-
-        // TESTING:  Can tapping on the button display the icon?
-        view.tab_tray_button_wrapper.setOnClickListener {
-            invokePendingDeleteJobs()
-            hideOnboardingIfNeeded()
-            nav(
-                R.id.homeFragment,
-                HomeFragmentDirections.actionHomeFragmentToTabTrayFragment()
-            )
-        }
 
         view.homeLayout.applyConstraintSet {
             sessionControlComponent.view {
