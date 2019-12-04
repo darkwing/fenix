@@ -17,7 +17,6 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
 import androidx.test.espresso.matcher.ViewMatchers.hasFocus
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.Until
 import androidx.test.uiautomator.By
@@ -30,7 +29,6 @@ import org.hamcrest.Matchers.containsString
 import org.mozilla.fenix.R
 import org.mozilla.fenix.helpers.click
 import org.mozilla.fenix.helpers.TestAssetHelper.waitingTime
-import org.mozilla.fenix.helpers.click
 
 /**
  * Implementation of Robot Pattern for the home screen menu.
@@ -199,7 +197,7 @@ private fun assertOpenTabsHeader() =
         .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
 
 private fun assertAddTabButton() =
-    onView(CoreMatchers.allOf(ViewMatchers.withId(R.id.add_tab_button), isDisplayed()))
+    onView(CoreMatchers.allOf(ViewMatchers.withId(R.id.tab_tray_button), isDisplayed()))
         .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
 
 private fun assertNoTabsOpenedHeader() =
