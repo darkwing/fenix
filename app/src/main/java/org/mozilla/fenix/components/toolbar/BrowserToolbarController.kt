@@ -313,6 +313,8 @@ class DefaultBrowserToolbarController(
     }
 
     private fun animateTabAndNavigateHome() {
+        navController.navigate(BrowserFragmentDirections.actionBrowserFragmentToTabsTrayFragment())
+        /*
         scope.launch {
             browserAnimator.beginAnimateOut()
             // Delay for a short amount of time so the browser has time to start animating out
@@ -325,6 +327,7 @@ class DefaultBrowserToolbarController(
                 )
             }
         }
+        */
     }
 
     private fun reportSiteIssue(reportUrl: String, private: Boolean) {

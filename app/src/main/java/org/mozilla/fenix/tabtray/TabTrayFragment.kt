@@ -5,10 +5,12 @@
 package org.mozilla.fenix.tabtray
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isVisible
 import mozilla.components.concept.engine.prompt.ShareData
 import androidx.fragment.app.Fragment
@@ -27,6 +29,7 @@ import org.mozilla.fenix.BrowserDirection
 import org.mozilla.fenix.HomeActivity
 import org.mozilla.fenix.browser.browsingmode.BrowsingMode
 import org.mozilla.fenix.collections.SaveCollectionStep
+import org.mozilla.fenix.components.StoreProvider
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.nav
 import org.mozilla.fenix.ext.sessionsOfType
@@ -40,9 +43,26 @@ class TabTrayFragment : Fragment(R.layout.fragment_tab_tray), TabsTray.Observer,
     private val sessionManager: SessionManager
         get() = requireComponents.core.sessionManager
 
+    private lateinit var tabTrayFragmentStore: TabTrayFragmentStore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        tabTrayFragmentStore = StoreProvider.get(this) {
+            TabTrayFragmentStore(
+                TabTrayFragmentState(
+                    tabs = emptyList()
+                )
+            )
+        }
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
