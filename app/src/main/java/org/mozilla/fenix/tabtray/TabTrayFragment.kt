@@ -12,6 +12,7 @@ import android.view.View
 import androidx.core.view.isVisible
 import mozilla.components.concept.engine.prompt.ShareData
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import mozilla.components.feature.tabs.tabstray.TabsFeature
 import kotlinx.android.synthetic.main.fragment_tab_tray.tabsTray
 import kotlinx.android.synthetic.main.fragment_tab_tray.view.*
@@ -19,6 +20,12 @@ import mozilla.components.support.base.feature.UserInteractionHandler
 import org.mozilla.fenix.R
 import org.mozilla.fenix.ext.requireComponents
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.tabstray.BrowserTabsTray
@@ -29,9 +36,11 @@ import org.mozilla.fenix.HomeActivity
 import org.mozilla.fenix.browser.browsingmode.BrowsingMode
 import org.mozilla.fenix.collections.SaveCollectionStep
 import org.mozilla.fenix.ext.components
+import org.mozilla.fenix.ext.logDebug
 import org.mozilla.fenix.ext.nav
 import org.mozilla.fenix.ext.sessionsOfType
 import org.mozilla.fenix.ext.showToolbar
+import org.mozilla.fenix.ext.toTab
 
 @SuppressWarnings("TooManyFunctions", "LargeClass")
 class TabTrayFragment : Fragment(R.layout.fragment_tab_tray), TabsTray.Observer, UserInteractionHandler {
@@ -109,6 +118,15 @@ class TabTrayFragment : Fragment(R.layout.fragment_tab_tray), TabsTray.Observer,
         super.onResume()
 
         onTabsChanged()
+
+        viewLifecycleOwner.lifecycleScope.launch(IO) {
+            delay(1200)
+            viewLifecycleOwner.lifecycleScope.launch(Main) {
+                scrollToSelectedTab()
+            }
+        }
+
+        //scrollToSelectedTab()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -229,6 +247,33 @@ class TabTrayFragment : Fragment(R.layout.fragment_tab_tray), TabsTray.Observer,
 
         if (hasNoTabs) {
             view?.announceForAccessibility(view?.context?.getString(R.string.no_open_tabs_description))
+        }
+    }
+
+    private fun scrollToSelectedTab() {
+        /*
+
+        val position = (sessionControlView!!.view.adapter as SessionControlAdapter)
+            .currentList.indexOfFirst {
+            it is AdapterItem.TabItem && it.tab.selected == true
+        }
+        if (position > 0) {
+            (sessionControlView!!.view.layoutManager as LinearLayoutManager)
+                .scrollToPositionWithOffset(position, SELECTED_TAB_OFFSET)
+        }
+         */
+        val selectedIndex = sessionManager
+            .selectedSession?.let { getListOfSessions().indexOf(it) } ?: 0
+
+        logDebug("davidwalsh", "-------------------------")
+        logDebug("davidwalsh", selectedIndex.toString())
+        (tabsTray as? BrowserTabsTray)?.also { tray ->
+            logDebug("davidwalsh", tray.toString())
+            tray.scrollBy(0, 100)
+            (tray.layoutManager as LinearLayoutManager).also { lm ->
+                logDebug("davidwalsh", lm.toString())
+                lm.scrollToPositionWithOffset(selectedIndex, 20)
+            }
         }
     }
 }
