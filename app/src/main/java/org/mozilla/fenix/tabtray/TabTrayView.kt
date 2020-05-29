@@ -5,9 +5,13 @@
 package org.mozilla.fenix.tabtray
 
 import android.content.Context
+import android.transition.AutoTransition
+import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.tabs.TabLayout
@@ -15,6 +19,11 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.component_tabstray.*
 import kotlinx.android.synthetic.main.component_tabstray.view.*
 import kotlinx.android.synthetic.main.component_tabstray_fab.view.*
+import kotlinx.android.synthetic.main.component_tabstray_fab.view.new_tab_button
+import kotlinx.android.synthetic.main.component_tabstray_fab_collapsed.view.*
+import kotlinx.android.synthetic.main.component_tabstray_fab_expanded.view.*
+import kotlinx.android.synthetic.main.component_tabstray_fab_expanded.view.extend_fab_container
+import kotlinx.android.synthetic.main.search_suggestions_onboarding.view.*
 import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.item.SimpleBrowserMenuItem
 import mozilla.components.browser.state.selector.normalTabs
@@ -45,8 +54,15 @@ class TabTrayView(
     private val interactor: TabTrayInteractor,
     private val isPrivate: Boolean
 ) : LayoutContainer, TabsTray.Observer, TabLayout.OnTabSelectedListener {
+
+    val fabLayout = if (isPrivate) {
+        R.layout.component_tabstray_fab_expanded
+    } else {
+        R.layout.component_tabstray_fab_collapsed
+    }
+
     val fabView = LayoutInflater.from(container.context)
-        .inflate(R.layout.component_tabstray_fab, container, true)
+        .inflate(fabLayout, container, true)
 
     val view = LayoutInflater.from(container.context)
         .inflate(R.layout.component_tabstray, container, true)
@@ -61,14 +77,12 @@ class TabTrayView(
         get() = container
 
     init {
-        fabView.new_tab_button.compatElevation = ELEVATION
-
         behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 if (slideOffset >= SLIDE_OFFSET) {
-                    fabView.new_tab_button.show()
+                    // fabView.new_tab_button.show()
                 } else {
-                    fabView.new_tab_button.hide()
+                    // fabView.new_tab_button.hide()
                 }
             }
 
@@ -120,9 +134,11 @@ class TabTrayView(
                 .show(anchor = it)
         }
 
+        /*
         fabView.new_tab_button.setOnClickListener {
             interactor.onNewTabTapped(isPrivateModeSelected)
         }
+         */
 
         tabsTray.register(this)
         tabsFeature.start()
@@ -152,6 +168,29 @@ class TabTrayView(
         }
         view?.tab_tray_empty_view?.isVisible = hasNoTabs
         view?.tab_tray_overflow?.isVisible = !hasNoTabs
+
+        val nextButtonLayout = if (isPrivateModeSelected) {
+            R.layout.component_tabstray_fab_expanded
+        } else {
+            R.layout.component_tabstray_fab_collapsed
+        }
+
+        val set = ConstraintSet()
+        set.clone(view.context, nextButtonLayout)
+        TransitionManager.beginDelayedTransition(
+            container,
+            AutoTransition().setDuration(150)
+        )
+
+        /*
+        fabView.new_tab_button.text = if (isPrivateModeSelected) {
+            "Private"
+        } else {
+            ""
+        }
+         */
+
+        set.applyTo(fabView.extend_fab_container)
     }
 
     override fun onTabClosed(tab: Tab) {

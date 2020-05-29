@@ -556,4 +556,8 @@
         <item name="behavior_halfExpandedRatio">0.6</item>
         <item name="behavior_fitToContents">true</item>
     </style>
+
+    <style name="BottomSheetFab" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="backgroundTint">?accent</item>
+    </style>
 </resources>
