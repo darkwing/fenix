@@ -569,6 +569,10 @@ class HomeFragment : Fragment() {
             view?.add_tab_button?.isVisible = !it
             view?.tab_button?.isVisible = it
         }
+
+        if (requireContext().settings().useNewTabTray) {
+            scrollToTheTop()
+        }
     }
 
     override fun onPause() {
