@@ -1009,6 +1009,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun scrollToSelectedTab() {
+        if (requireContext().settings().useNewTabTray) {
+            return
+        }
+
         val position = (sessionControlView!!.view.adapter as SessionControlAdapter)
             .currentList.indexOfFirst {
             it is AdapterItem.TabItem && it.tab.selected == true
